@@ -60,16 +60,17 @@ async function updateUser(req, res, next) {
   try {
     const { name, about, avatar } = req.body;
     const id = req.user._id;
-    await User.updateOne({
+    const user = await User.findOneAndUpdate({
       _id: id,
     }, {
       name,
       about,
       avatar,
     }, {
+      fields: defaultFields,
+      new: true,
       runValidators: true,
     });
-    const user = await User.findById(id, defaultFields);
     if (!user) {
       return next(new HttpError('Not Found', 404));
     }
@@ -86,14 +87,15 @@ async function updateAvatar(req, res, next) {
   try {
     const { avatar } = req.body;
     const id = req.user._id;
-    await User.updateOne({
+    const user = await User.findOneAndUpdate({
       _id: id,
     }, {
       avatar,
     }, {
+      fields: defaultFields,
+      new: true,
       runValidators: true,
     });
-    const user = await User.findById(id, defaultFields);
     if (!user) {
       return next(new HttpError('Not Found', 404));
     }

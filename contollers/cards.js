@@ -64,14 +64,16 @@ async function addLike(req, res, next) {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return next(new HttpError('Bad Request', 400));
     }
-    await Card.updateOne({
+    const card = await Card.findOneAndUpdate({
       _id: id,
     }, {
       $addToSet: {
         likes: req.user._id,
       },
+    }, {
+      fields: defaultFields,
+      new: true,
     });
-    const card = await Card.findById(id, defaultFields);
     if (!card) {
       return next(new HttpError('Not Found', 404));
     }
@@ -87,14 +89,16 @@ async function removeLike(req, res, next) {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return next(new HttpError('Bad Request', 400));
     }
-    await Card.updateOne({
+    const card = await Card.findOneAndUpdate({
       _id: id,
     }, {
       $pull: {
         likes: req.user._id,
       },
+    }, {
+      fields: defaultFields,
+      new: true,
     });
-    const card = await Card.findById(id, defaultFields);
     if (!card) {
       return next(new HttpError('Not Found', 404));
     }
