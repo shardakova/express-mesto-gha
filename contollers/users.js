@@ -44,7 +44,7 @@ async function getUser(req, res, next) {
       id = req.user._id;
     }
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return next(new HttpError('Not Found', 404));
+      return next(new HttpError('Bad Request', 400));
     }
     const user = await User.findById(id, defaultFields);
     if (!user) {

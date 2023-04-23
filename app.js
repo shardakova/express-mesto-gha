@@ -51,6 +51,10 @@ app.use((err, req, res, next) => {
   return res.send(err.message);
 });
 
+app.use((req, res) => {
+  res.status(404).send({ message: 'Not Found' });
+});
+
 app.listen(process.env.SERVER_PORT, process.env.SERVER_HOST, () => {
   console.log(`Express server has been started at http://${process.env.SERVER_HOST}:${process.env.SERVER_PORT}`);
 });

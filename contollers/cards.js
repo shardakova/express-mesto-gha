@@ -43,7 +43,7 @@ async function deleteCard(req, res, next) {
   try {
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return next(new HttpError('Not Found', 404));
+      return next(new HttpError('Bad Request', 400));
     }
     const result = await Card.deleteOne({
       _id: id,
@@ -62,7 +62,7 @@ async function addLike(req, res, next) {
   try {
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return next(new HttpError('Not Found', 404));
+      return next(new HttpError('Bad Request', 400));
     }
     await Card.updateOne({
       _id: id,
@@ -85,7 +85,7 @@ async function removeLike(req, res, next) {
   try {
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return next(new HttpError('Not Found', 404));
+      return next(new HttpError('Bad Request', 400));
     }
     await Card.updateOne({
       _id: id,
