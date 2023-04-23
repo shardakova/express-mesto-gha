@@ -20,7 +20,7 @@ require('dotenv').config();
 // Connect to the database
 (async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI);
+    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/mestodb');
   } catch (err) {
     console.error(err);
     process.exit(1);
