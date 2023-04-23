@@ -58,13 +58,16 @@ async function getUser(req, res, next) {
 
 async function updateUser(req, res, next) {
   try {
-    const { name, about } = req.body;
+    const { name, about, avatar } = req.body;
     const id = req.user._id;
     await User.updateOne({
       _id: id,
     }, {
       name,
       about,
+      avatar,
+    }, {
+      runValidators: true,
     });
     const user = await User.findById(id, defaultFields);
     if (!user) {
@@ -87,6 +90,8 @@ async function updateAvatar(req, res, next) {
       _id: id,
     }, {
       avatar,
+    }, {
+      runValidators: true,
     });
     const user = await User.findById(id, defaultFields);
     if (!user) {

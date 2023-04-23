@@ -52,7 +52,7 @@ async function deleteCard(req, res, next) {
     if (result.deletedCount === 0) {
       return next(new HttpError('Not Found', 404));
     }
-    return res.send();
+    return res.send({});
   } catch (err) {
     return next(new HttpError('Internal Server Error', 500));
   }

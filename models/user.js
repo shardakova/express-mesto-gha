@@ -17,6 +17,7 @@ const scheme = {
   },
   avatar: {
     type: String,
+    required: true,
     validate: {
       type: 'format',
       validator: (value) => {
