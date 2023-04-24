@@ -2,6 +2,8 @@
   "name": "express-mesto-gha",
   "version": "1.0.0",
   "main": "app.js",
+  "author": "shardakova",
+  "description": "Backend for Mesto project",
   "scripts": {
     "dev": "nodemon app.js",
     "start": "node app.js",

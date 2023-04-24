@@ -9,12 +9,12 @@ const defaultFields = {
   avatar: 1,
 };
 
-async function getUsers(req, res) {
+async function getUsers(req, res, next) {
   try {
     const users = await User.find({}, defaultFields);
-    res.send(users);
+    return res.send(users);
   } catch (err) {
-    throw new HttpError('Internal Server Error', 500);
+    return next(new HttpError('Internal Server Error', 500));
   }
 }
 
@@ -58,14 +58,13 @@ async function getUser(req, res, next) {
 
 async function updateUser(req, res, next) {
   try {
-    const { name, about, avatar } = req.body;
+    const { name, about } = req.body;
     const id = req.user._id;
     const user = await User.findOneAndUpdate({
       _id: id,
     }, {
       name,
       about,
-      avatar,
     }, {
       fields: defaultFields,
       new: true,

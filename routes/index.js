@@ -1,7 +1,10 @@
+const express = require('express');
 const cards = require('./cards');
 const users = require('./users');
 
-module.exports = {
-  cards,
-  users,
-};
+const router = express.Router();
+
+router.use('/', cards);
+router.use('/', users);
+
+module.exports = router;

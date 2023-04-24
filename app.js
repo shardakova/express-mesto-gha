@@ -39,8 +39,10 @@ app.use((req, res, next) => {
   next();
 });
 
-Object.values(routes).forEach((route) => {
-  app.use(route);
+app.use(routes);
+
+app.use((req, res) => {
+  res.status(404).send({ message: 'Not Found' });
 });
 
 app.use((err, req, res, next) => {
@@ -49,10 +51,6 @@ app.use((err, req, res, next) => {
   }
   res.status(err.status || 500);
   return res.send(err.message);
-});
-
-app.use((req, res) => {
-  res.status(404).send({ message: 'Not Found' });
 });
 
 app.listen(process.env.SERVER_PORT, process.env.SERVER_HOST, () => {

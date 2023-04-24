@@ -11,12 +11,12 @@ const defaultFields = {
   createdAt: 1,
 };
 
-async function getCards(req, res) {
+async function getCards(req, res, next) {
   try {
     const cards = await Card.find({}, defaultFields);
-    res.send(cards);
+    return res.send(cards);
   } catch (err) {
-    throw new HttpError('Internal Server Error', 500);
+    return next(new HttpError('Internal Server Error', 500));
   }
 }
 
@@ -52,7 +52,7 @@ async function deleteCard(req, res, next) {
     if (result.deletedCount === 0) {
       return next(new HttpError('Not Found', 404));
     }
-    return res.send({});
+    return res.send({ message: 'Карточка успешно удалена.' });
   } catch (err) {
     return next(new HttpError('Internal Server Error', 500));
   }
