@@ -45,6 +45,13 @@ async function deleteCard(req, res, next) {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return next(new HttpError('Bad Request', 400));
     }
+    const card = await Card.findById(id);
+    if (!card) {
+      return next(new HttpError('Not Found', 404));
+    }
+    if (card.owner.toString() !== req.user._id) {
+      return next(new HttpError('Forbidden', 403));
+    }
     const result = await Card.deleteOne({
       _id: id,
       owner: req.user._id,

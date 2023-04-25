@@ -3,7 +3,11 @@ const path = require('path');
 const mongoose = require('mongoose');
 const express = require('express');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+const { celebrate, errors } = require('celebrate');
 const routes = require('./routes/index');
+const usersController = require('./contollers/users');
+const validationSchemas = require('./utils/validationSchemas');
 
 // Prepare env variables
 try {
@@ -31,15 +35,13 @@ require('dotenv').config();
 const app = express();
 
 app.use(bodyParser.json());
+app.use(cookieParser());
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '64459d5c226d3741c0d045a8',
-  };
-  next();
-});
-
+app.post('/signin', celebrate(validationSchemas.login), usersController.login);
+app.post('/signup', celebrate(validationSchemas.createUser), usersController.createUser);
 app.use(routes);
+
+app.use(errors());
 
 app.use((req, res) => {
   res.status(404).send({ message: 'Not Found' });

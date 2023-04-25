@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const scheme = {
+const schema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -37,6 +37,6 @@ const scheme = {
     type: Date,
     default: Date.now,
   },
-};
+});
 
-module.exports = mongoose.model('card', new mongoose.Schema(scheme));
+module.exports = mongoose.model('card', schema);
