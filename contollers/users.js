@@ -1,9 +1,15 @@
 const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
-const HttpError = require('../utils/HttpError');
-const ValidationError = require('../utils/ValidationError');
 const User = require('../models/user');
+const config = require('../config');
+const {
+  BadRequestError,
+  ConflictError,
+  NotFoundError,
+  UnauthorizedError,
+  ValidationError,
+} = require('../utils/errors');
 
 const defaultFields = {
   email: 1,
@@ -17,7 +23,7 @@ async function getUsers(req, res, next) {
     const users = await User.find({}, defaultFields);
     return res.send(users);
   } catch (err) {
-    return next(new HttpError('Internal Server Error', 500));
+    return next(err);
   }
 }
 
@@ -49,9 +55,9 @@ async function createUser(req, res, next) {
       return next(new ValidationError(err));
     }
     if (err.name === 'MongoServerError' && err.code === 11000) {
-      return next(new HttpError('Conflict', 409));
+      return next(new ConflictError());
     }
-    return next(new HttpError('Internal Server Error', 500));
+    return next(err);
   }
 }
 
@@ -62,15 +68,15 @@ async function getUser(req, res, next) {
       id = req.user._id;
     }
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return next(new HttpError('Bad Request', 400));
+      return next(new BadRequestError());
     }
     const user = await User.findById(id, defaultFields);
     if (!user) {
-      return next(new HttpError('Not Found', 404));
+      return next(new NotFoundError());
     }
     return res.send(user);
   } catch (err) {
-    return next(new HttpError('Internal Server Error', 500));
+    return next(err);
   }
 }
 
@@ -89,14 +95,14 @@ async function updateUser(req, res, next) {
       runValidators: true,
     });
     if (!user) {
-      return next(new HttpError('Not Found', 404));
+      return next(new NotFoundError());
     }
     return res.send(user);
   } catch (err) {
     if (err instanceof mongoose.Error.ValidationError) {
       return next(new ValidationError(err));
     }
-    return next(new HttpError('Internal Server Error', 500));
+    return next(err);
   }
 }
 
@@ -114,14 +120,14 @@ async function updateAvatar(req, res, next) {
       runValidators: true,
     });
     if (!user) {
-      return next(new HttpError('Not Found', 404));
+      return next(new NotFoundError());
     }
     return res.send(user);
   } catch (err) {
     if (err instanceof mongoose.Error.ValidationError) {
       return next(new ValidationError(err));
     }
-    return next(new HttpError('Internal Server Error', 500));
+    return next(err);
   }
 }
 
@@ -134,17 +140,19 @@ async function login(req, res, next) {
       password: 1,
     });
     if (!user) {
-      return next(new HttpError('Unauthorized', 401));
+      return next(new UnauthorizedError());
     }
     const isPasswordValid = bcrypt.compareSync(password, user.password);
     if (!isPasswordValid) {
-      return next(new HttpError('Unauthorized', 401));
+      return next(new UnauthorizedError());
     }
-    const token = jwt.sign({ _id: user._id }, process.env.JWT_TOKEN_SECRET);
+    const token = jwt.sign({ _id: user._id }, config.JWT_TOKEN_SECRET, {
+      expiresIn: '7d',
+    });
     res.cookie('token', token, { httpOnly: true });
-    return res.send({ token });
+    return res.send({});
   } catch (err) {
-    return next(new HttpError('Internal Server Error', 500));
+    return next(err);
   }
 }
 

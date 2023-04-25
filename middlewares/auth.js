@@ -1,12 +1,16 @@
 const jwt = require('jsonwebtoken');
-const HttpError = require('../utils/HttpError');
+const config = require('../config');
+const { UnauthorizedError } = require('../utils/errors');
 
 function auth(req, res, next) {
   try {
-    req.user = jwt.verify(req.cookies.token, process.env.JWT_TOKEN_SECRET);
+    if (!req.cookies.token) {
+      return next(new UnauthorizedError());
+    }
+    req.user = jwt.verify(req.cookies.token, config.JWT_TOKEN_SECRET);
     return next();
   } catch (err) {
-    return next(new HttpError('Invalid JWT Token', 401));
+    return next(new UnauthorizedError());
   }
 }
 

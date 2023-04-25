@@ -53,16 +53,11 @@ const schema = new mongoose.Schema({
   },
 });
 
-schema.pre('save', function save(next) {
+schema.pre('save', function save() {
   const user = this;
   if (user.isModified('password') || this.isNew) {
-    try {
-      user.password = bcrypt.hashSync(user.password, 10);
-    } catch (err) {
-      return next(err);
-    }
+    user.password = bcrypt.hashSync(user.password, 10);
   }
-  return next();
 });
 
 module.exports = mongoose.model('user', schema);

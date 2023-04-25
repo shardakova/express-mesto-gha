@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
-const HttpError = require('../utils/HttpError');
-const ValidationError = require('../utils/ValidationError');
+const {
+  BadRequestError,
+  ForbiddenError,
+  NotFoundError,
+  ValidationError,
+} = require('../utils/errors');
 const Card = require('../models/card');
 
 const defaultFields = {
@@ -16,26 +20,25 @@ async function getCards(req, res, next) {
     const cards = await Card.find({}, defaultFields);
     return res.send(cards);
   } catch (err) {
-    return next(new HttpError('Internal Server Error', 500));
+    return next(err);
   }
 }
 
 async function createCard(req, res, next) {
   const { name, link } = req.body;
   try {
-    const card = new Card({
+    const card = await Card.create({
       name,
       link,
       owner: req.user._id,
     });
-    await card.validate();
-    await card.save();
+    res.status(201);
     return res.send(card);
   } catch (err) {
     if (err instanceof mongoose.Error.ValidationError) {
       return next(new ValidationError(err));
     }
-    return next(new HttpError('Internal Server Error', 500));
+    return next(err);
   }
 }
 
@@ -43,25 +46,19 @@ async function deleteCard(req, res, next) {
   try {
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return next(new HttpError('Bad Request', 400));
+      return next(new BadRequestError());
     }
     const card = await Card.findById(id);
     if (!card) {
-      return next(new HttpError('Not Found', 404));
+      return next(new NotFoundError());
     }
     if (card.owner.toString() !== req.user._id) {
-      return next(new HttpError('Forbidden', 403));
+      return next(new ForbiddenError());
     }
-    const result = await Card.deleteOne({
-      _id: id,
-      owner: req.user._id,
-    });
-    if (result.deletedCount === 0) {
-      return next(new HttpError('Not Found', 404));
-    }
+    await card.deleteOne();
     return res.send({ message: 'Карточка успешно удалена.' });
   } catch (err) {
-    return next(new HttpError('Internal Server Error', 500));
+    return next(err);
   }
 }
 
@@ -69,7 +66,7 @@ async function addLike(req, res, next) {
   try {
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return next(new HttpError('Bad Request', 400));
+      return next(new BadRequestError());
     }
     const card = await Card.findOneAndUpdate({
       _id: id,
@@ -82,11 +79,11 @@ async function addLike(req, res, next) {
       new: true,
     });
     if (!card) {
-      return next(new HttpError('Not Found', 404));
+      return next(new NotFoundError());
     }
     return res.send(card);
   } catch (err) {
-    return next(new HttpError('Internal Server Error', 500));
+    return next(err);
   }
 }
 
@@ -94,7 +91,7 @@ async function removeLike(req, res, next) {
   try {
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return next(new HttpError('Bad Request', 400));
+      return next(new BadRequestError());
     }
     const card = await Card.findOneAndUpdate({
       _id: id,
@@ -107,11 +104,11 @@ async function removeLike(req, res, next) {
       new: true,
     });
     if (!card) {
-      return next(new HttpError('Not Found', 404));
+      return next(new NotFoundError());
     }
     return res.send(card);
   } catch (err) {
-    return next(new HttpError('Internal Server Error', 500));
+    return next(err);
   }
 }
 
