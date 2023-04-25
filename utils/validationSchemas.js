@@ -40,7 +40,11 @@ const updateAvatar = {
 
 const createCard = {
   body: Joi.object({
-    name: Joi.string().required().trim().min(2).max(30),
+    name: Joi.string()
+      .required()
+      .trim()
+      .min(2)
+      .max(30),
     link: Joi.string().required().uri({
       scheme: [
         /https?/,
