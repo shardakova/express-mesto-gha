@@ -8,7 +8,6 @@ const {
   ConflictError,
   NotFoundError,
   UnauthorizedError,
-  ValidationError,
 } = require('../utils/errors');
 
 const defaultFields = {
@@ -52,7 +51,7 @@ async function createUser(req, res, next) {
     });
   } catch (err) {
     if (err instanceof mongoose.Error.ValidationError) {
-      return next(new ValidationError(err));
+      return next(new BadRequestError());
     }
     if (err.name === 'MongoServerError' && err.code === 11000) {
       return next(new ConflictError());
@@ -100,7 +99,7 @@ async function updateUser(req, res, next) {
     return res.send(user);
   } catch (err) {
     if (err instanceof mongoose.Error.ValidationError) {
-      return next(new ValidationError(err));
+      return next(new BadRequestError());
     }
     return next(err);
   }
@@ -125,7 +124,7 @@ async function updateAvatar(req, res, next) {
     return res.send(user);
   } catch (err) {
     if (err instanceof mongoose.Error.ValidationError) {
-      return next(new ValidationError(err));
+      return next(new BadRequestError());
     }
     return next(err);
   }

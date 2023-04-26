@@ -3,7 +3,6 @@ const {
   BadRequestError,
   ForbiddenError,
   NotFoundError,
-  ValidationError,
 } = require('../utils/errors');
 const Card = require('../models/card');
 
@@ -36,7 +35,7 @@ async function createCard(req, res, next) {
     return res.send(card);
   } catch (err) {
     if (err instanceof mongoose.Error.ValidationError) {
-      return next(new ValidationError(err));
+      return next(new BadRequestError());
     }
     return next(err);
   }

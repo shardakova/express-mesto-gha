@@ -1,6 +1,6 @@
 const Joi = require('joi');
 
-function UrlCustomValidator(value, helpers) {
+function urlValidator(value, helpers) {
   let parsedUrl;
   try {
     parsedUrl = new URL(value);
@@ -27,7 +27,7 @@ const createUser = {
     password: Joi.string().required(),
     name: Joi.string().trim().min(2).max(30),
     about: Joi.string().trim().min(2).max(30),
-    avatar: Joi.string().custom(UrlCustomValidator),
+    avatar: Joi.string().custom(urlValidator),
   }),
 };
 
@@ -48,7 +48,7 @@ const updateUser = {
 
 const updateAvatar = {
   body: Joi.object({
-    avatar: Joi.string().custom(UrlCustomValidator),
+    avatar: Joi.string().required().custom(urlValidator),
   }),
 };
 
@@ -59,7 +59,7 @@ const createCard = {
       .trim()
       .min(2)
       .max(30),
-    link: Joi.string().required().custom(UrlCustomValidator),
+    link: Joi.string().required().custom(urlValidator),
   }),
 };
 
